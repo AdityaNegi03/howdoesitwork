@@ -22,6 +22,7 @@ const LAMINATION = '#767c86'
 export const dcMotor: Machine = {
   id: 'dc-motor',
   name: 'DC Motor',
+  category: 'machines',
   tagline: 'Electricity in one end, spinning out the other',
   description:
     'A brushed DC motor is the simplest useful electric motor there is, and it has barely changed in a century. A fixed magnetic field, a coil that can rotate inside it, and a mechanical switch that flips the coil\'s current every half turn so the push never reverses. Open it up and you can see all four ideas in one place.',

@@ -1,7 +1,11 @@
 import { create } from 'zustand'
 import { MACHINES } from './content'
 
+export type View = 'catalogue' | 'viewer'
+
 export interface AppState {
+  /** Catalogue is the entry point; the viewer opens once a machine is picked. */
+  view: View
   machineId: string
   selectedPartId: string | null
   hoveredPartId: string | null
@@ -14,7 +18,8 @@ export interface AppState {
   /** Bumped to ask the camera to return to the machine's default framing. */
   resetNonce: number
 
-  setMachine: (id: string) => void
+  openMachine: (id: string) => void
+  showCatalogue: () => void
   select: (id: string | null) => void
   hover: (id: string | null) => void
   setExplode: (v: number) => void
@@ -24,7 +29,15 @@ export interface AppState {
   resetView: () => void
 }
 
+/** State that must not leak from one machine to the next. */
+const freshMachineState = {
+  selectedPartId: null,
+  hoveredPartId: null,
+  explode: 0,
+}
+
 export const useApp = create<AppState>((set, get) => ({
+  view: 'catalogue',
   machineId: MACHINES[0].id,
   selectedPartId: null,
   hoveredPartId: null,
@@ -33,8 +46,9 @@ export const useApp = create<AppState>((set, get) => ({
   showLabels: true,
   resetNonce: 0,
 
-  setMachine: (id) =>
-    set({ machineId: id, selectedPartId: null, hoveredPartId: null, explode: 0, resetNonce: get().resetNonce + 1 }),
+  openMachine: (id) =>
+    set({ view: 'viewer', machineId: id, ...freshMachineState, resetNonce: get().resetNonce + 1 }),
+  showCatalogue: () => set({ view: 'catalogue', ...freshMachineState }),
   select: (id) => set({ selectedPartId: id }),
   hover: (id) => set({ hoveredPartId: id }),
   setExplode: (v) => set({ explode: Math.min(1, Math.max(0, v)) }),

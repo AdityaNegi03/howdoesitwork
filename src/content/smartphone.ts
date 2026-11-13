@@ -18,6 +18,7 @@ const DARK = '#23262c'
 export const smartphone: Machine = {
   id: 'smartphone',
   name: 'Smartphone',
+  category: 'electronics',
   tagline: 'A computer, a radio and a camera sharing one battery',
   description:
     'Almost every slab phone made in the last decade is the same sandwich: a sheet of glass you touch, a display under it, a metal frame holding everything rigid, then a logic board and a battery lying side by side, and a back cover to close it up. Open it up and the layers come apart in the order a repair tech would remove them.',

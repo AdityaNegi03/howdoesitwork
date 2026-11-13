@@ -100,9 +100,13 @@ export interface Part {
   analogy?: string
 }
 
+/** Top-level grouping used by the catalogue navigation. */
+export type MachineCategory = 'electronics' | 'computer-accessories' | 'machines' | 'software'
+
 export interface Machine {
   id: string
   name: string
+  category: MachineCategory
   tagline: string
   description: string
   /** Camera framing used on load and on "reset view". */

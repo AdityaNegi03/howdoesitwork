@@ -76,8 +76,14 @@ kbd {
   display: flex;
   align-items: center;
   gap: 10px;
+  font: inherit;
   font-weight: 650;
   letter-spacing: -0.01em;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
 }
 
 .brand__mark {
@@ -93,32 +99,138 @@ kbd {
   font-weight: 400;
 }
 
-.machine-tabs {
-  display: flex;
-  gap: 4px;
-}
-
-.machine-tab {
+.back-button {
   background: transparent;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   color: var(--text-dim);
   font: inherit;
-  font-size: 13px;
-  padding: 5px 12px;
+  font-size: 12.5px;
+  padding: 5px 11px;
   border-radius: 7px;
   cursor: pointer;
+  white-space: nowrap;
   transition: background 0.14s, color 0.14s;
 }
 
-.machine-tab:hover {
+.back-button:hover {
   background: var(--panel-raised);
   color: var(--text);
 }
 
-.machine-tab.is-active {
+.topbar__crumb {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-left: 2px;
+}
+
+/* ------------------------------------------------------- machine switcher */
+
+.switcher {
+  position: relative;
+}
+
+.switcher__trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: var(--panel-raised);
-  border-color: var(--border);
+  border: 1px solid var(--border);
   color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.switcher__trigger:hover,
+.switcher__trigger.is-open {
+  border-color: #313844;
+}
+
+.switcher__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.switcher__chevron {
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+.switcher__backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: default;
+  z-index: 40;
+}
+
+.switcher__menu {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  min-width: 230px;
+  background: var(--panel-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.6);
+  z-index: 50;
+}
+
+.switcher__group + .switcher__group {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.switcher__group-label {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding: 6px 9px 3px;
+}
+
+.switcher__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  padding: 6px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.switcher__item:hover {
+  background: #1b202a;
+  color: var(--text);
+}
+
+.switcher__item.is-current {
+  color: var(--text);
+  background: #1b202a;
+}
+
+.switcher__item-parts {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: #636b7c;
 }
 
 .layout {
@@ -572,5 +684,180 @@ kbd {
 
   .slider input[type='range'] {
     width: 78px;
+  }
+}
+
+/* ------------------------------------------------------------- catalogue */
+
+.catalogue-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.catalogue {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 56px 32px 80px;
+}
+
+.catalogue__intro {
+  margin-bottom: 52px;
+}
+
+.catalogue__intro h1 {
+  font-size: 38px;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+}
+
+.catalogue__intro p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  max-width: 54ch;
+  margin: 0 0 16px;
+}
+
+.catalogue__count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #6b7384;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.catalogue__section {
+  margin-bottom: 40px;
+}
+
+.catalogue__section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.catalogue__swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  align-self: center;
+}
+
+.catalogue__section-head h2 {
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.catalogue__blurb {
+  font-size: 12.5px;
+  color: #6b7384;
+}
+
+.catalogue__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.catalogue__empty {
+  font-size: 12.5px;
+  color: #5d6474;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 20px 18px;
+}
+
+.machine-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 16px 16px 13px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.machine-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.machine-card:hover {
+  background: var(--panel-raised);
+  border-color: #2b323d;
+  transform: translateY(-1px);
+}
+
+.machine-card:hover::before {
+  opacity: 1;
+}
+
+.machine-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.machine-card__tagline {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+.machine-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.machine-card__swatches {
+  display: flex;
+  gap: 3px;
+}
+
+.machine-card__swatches span {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.machine-card__parts {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: #636b7c;
+}
+
+@media (max-width: 860px) {
+  .catalogue {
+    padding: 36px 18px 60px;
+  }
+
+  .catalogue__intro h1 {
+    font-size: 28px;
+  }
+
+  .topbar__crumb {
+    display: none;
   }
 }
