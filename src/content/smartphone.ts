@@ -1,0 +1,612 @@
+import type { Machine } from './types'
+
+/**
+ * A generic modern smartphone, not any particular manufacturer's device.
+ * Layout follows the layer stack every flagship shares: glass, display, shield,
+ * midframe, board + battery side by side, then the rear stack and back glass.
+ *
+ * Body dimensions: 1.45 wide x 3.0 tall x 0.16 thick. Screen faces +Z.
+ */
+
+const GLASS = '#9fc4e8'
+const ALUMINIUM = '#9aa0ab'
+const PCB_GREEN = '#15402f'
+const COPPER = '#c77b43'
+const STEEL = '#8e949e'
+const DARK = '#23262c'
+
+export const smartphone: Machine = {
+  id: 'smartphone',
+  name: 'Smartphone',
+  tagline: 'A computer, a radio and a camera sharing one battery',
+  description:
+    'Almost every slab phone made in the last decade is the same sandwich: a sheet of glass you touch, a display under it, a metal frame holding everything rigid, then a logic board and a battery lying side by side, and a back cover to close it up. Open it up and the layers come apart in the order a repair tech would remove them.',
+  // Distance is recomputed from the machine's bounds; this sets the angle.
+  defaultCamera: { position: [3.0, 2.0, 5.6], target: [0, 0, 0] },
+  parts: [
+    {
+      id: 'cover-glass',
+      name: 'Cover Glass',
+      category: 'structure',
+      layer: 0,
+      position: [0, 0, 0.07],
+      explode: [0, 0, 1.95],
+      color: GLASS,
+      opacity: 0.16,
+      roughness: 0.03,
+      metalness: 0.05,
+      shape: [{ geometry: { type: 'box', size: [1.45, 3.0, 0.012], radius: 0.08 } }],
+      tagline: 'The chemically hardened sheet you actually touch',
+      body: [
+        'The outermost layer is a thin sheet of aluminosilicate glass that has been chemically strengthened: the glass is bathed in molten potassium salt, and the larger potassium ions swap places with the smaller sodium ions already in the surface. Those oversized ions are wedged in too tightly, leaving the outer skin under permanent compression.',
+        'That matters because glass does not fail from being squeezed, it fails from being stretched. A crack can only grow where the surface is in tension. A pre-compressed surface has to be pushed past its built-in squeeze before any tension appears at all, which is why a phone can survive a pocket full of keys but still shatter when it lands on a corner, where the impact bends the panel far enough to overcome it.',
+        'It is also the first thing removed in any screen repair, and it is bonded to the display beneath it with an adhesive so thin it is effectively optically invisible.',
+      ],
+      specs: [
+        { label: 'Thickness', value: '0.5 – 0.8 mm' },
+        { label: 'Treatment', value: 'Ion-exchange strengthening' },
+        { label: 'Surface layer', value: 'Oleophobic anti-fingerprint coating' },
+      ],
+      analogy:
+        'Like pre-stressed concrete: it is squeezed from the factory so that everyday bending never puts it in tension.',
+    },
+    {
+      id: 'oled-panel',
+      name: 'OLED Display Panel',
+      category: 'display',
+      layer: 1,
+      position: [0, 0, 0.05],
+      explode: [0, 0, 1.45],
+      color: '#0d1014',
+      roughness: 0.35,
+      metalness: 0.0,
+      shape: [
+        // Sized to the aperture the midframe rails leave, so the frame reads as
+        // a thin bezel rather than sitting on top of the picture. The black
+        // outer plate is the mask every panel has around its active area.
+        { geometry: { type: 'box', size: [1.35, 2.9, 0.016], radius: 0.06 } },
+        {
+          geometry: { type: 'box', size: [1.3, 2.85, 0.004], radius: 0.055 },
+          offset: [0, 0, 0.011],
+          color: '#0d1830',
+          emissive: '#1f4fc4',
+          emissiveIntensity: 0.26,
+          roughness: 0.2,
+        },
+      ],
+      tagline: 'Millions of individual lights, each one its own pixel',
+      body: [
+        'An OLED panel has no backlight. Every sub-pixel is a sandwich of organic compounds that emits its own light when current passes through it, which is why an OLED can show true black: a pixel that is off is simply a pixel drawing no current.',
+        'Behind the glass sits a thin-film transistor layer — a grid of microscopic switches, at least two per sub-pixel, that hold each one at the right brightness until the next refresh. A 2400 x 1080 panel has roughly 7.8 million sub-pixels and well over 15 million transistors, all printed onto a plastic substrate thinner than a sheet of paper.',
+        'Touch sensing is usually built into the same stack rather than added as a separate layer. A grid of transparent electrodes carries a small charge, and your fingertip — being mostly conductive salt water — steals a tiny amount of it. The controller reads which intersections lost charge and works out where you pressed.',
+      ],
+      specs: [
+        { label: 'Technology', value: 'Active-matrix OLED on flexible substrate' },
+        { label: 'Sub-pixels', value: '~7.8 million at 1080p' },
+        { label: 'Refresh rate', value: '1 – 120 Hz, variable' },
+        { label: 'Touch', value: 'Projected capacitive, integrated on-cell' },
+      ],
+      analogy:
+        'A stadium crowd holding up coloured cards, where every single person is told what colour to hold 120 times a second.',
+    },
+    {
+      id: 'display-shield',
+      name: 'Graphite Shield',
+      category: 'thermal',
+      layer: 2,
+      position: [0, 0, 0.032],
+      explode: [0, 0, 1.05],
+      color: '#2b2f36',
+      roughness: 0.6,
+      metalness: 0.4,
+      shape: [
+        { geometry: { type: 'box', size: [1.36, 2.86, 0.008], radius: 0.05 } },
+        {
+          geometry: { type: 'box', size: [1.2, 1.0, 0.004] },
+          offset: [0, 0.75, -0.006],
+          color: COPPER,
+          metalness: 0.85,
+          roughness: 0.3,
+        },
+      ],
+      tagline: 'Spreads heat sideways and keeps the radios quiet',
+      body: [
+        'A phone has no fan and nowhere to vent, so the only way to get rid of heat is to spread it across as much surface area as possible and let the whole body radiate it. This layer is a sheet of synthetic graphite, which conducts heat along its plane several times better than copper while weighing almost nothing.',
+        'Its job is to take the hot spot over the processor — which can be running at 5 watts in a space the size of a fingernail — and smear it out across the back of the display so no single point gets uncomfortable. Many phones add a flattened copper heat pipe, visible here, where a sealed trace of fluid boils at the hot end and condenses at the cool end, moving heat far faster than solid metal alone.',
+        'The same sheet doubles as an electromagnetic shield, stopping the display driver\'s switching noise from leaking into the antennas sitting a few millimetres away.',
+      ],
+      specs: [
+        { label: 'Material', value: 'Pyrolytic graphite sheet' },
+        { label: 'In-plane conductivity', value: '~1500 W/m·K (copper is ~400)' },
+        { label: 'Secondary role', value: 'EMI shielding' },
+      ],
+      analogy:
+        'A cast-iron pan rather than a thin tin one: it does not remove the heat, it refuses to let any one spot get hot.',
+    },
+    {
+      id: 'front-camera',
+      name: 'Front Camera',
+      category: 'imaging',
+      layer: 3,
+      // Sits behind the display stack, as it does in a real punch-hole phone.
+      position: [0, 1.25, -0.03],
+      explode: [0.55, 0.5, 1.25],
+      color: DARK,
+      metalness: 0.5,
+      roughness: 0.4,
+      shape: [
+        { geometry: { type: 'box', size: [0.16, 0.16, 0.08] } },
+        {
+          geometry: { type: 'cylinder', radius: 0.055, height: 0.035, segments: 28 },
+          offset: [0, 0, 0.03],
+          rotation: [Math.PI / 2, 0, 0],
+          color: '#0a1628',
+          metalness: 0.9,
+          roughness: 0.05,
+        },
+      ],
+      tagline: 'A sensor the size of a sesame seed behind the glass',
+      body: [
+        'The selfie camera is the same machine as the rear cameras, just smaller: a stack of plastic lens elements focusing light onto a CMOS image sensor a few millimetres across.',
+        'Because it sits under the cover glass with no room for a mechanical shutter or a moving focus group, it is usually fixed-focus or uses a tiny voice-coil actuator that shifts the lens stack by a fraction of a millimetre.',
+        'Many phones put a second, invisible camera next to it: an infrared projector and receiver that paints thousands of dots across your face and measures how they deform, building a depth map that a photograph of you cannot fake.',
+      ],
+      specs: [
+        { label: 'Sensor size', value: 'Typically 1/3.6" or smaller' },
+        { label: 'Lens elements', value: '4 – 6 moulded plastic' },
+        { label: 'Focus', value: 'Fixed or voice-coil actuator' },
+      ],
+    },
+    {
+      id: 'earpiece',
+      name: 'Earpiece Speaker',
+      category: 'audio',
+      layer: 3,
+      position: [-0.3, 1.33, -0.03],
+      explode: [-0.55, 0.45, 1.3],
+      color: '#3a3f47',
+      metalness: 0.6,
+      roughness: 0.45,
+      shape: [
+        { geometry: { type: 'box', size: [0.45, 0.14, 0.09], radius: 0.03 } },
+        {
+          geometry: { type: 'cylinder', radius: 0.012, height: 0.06, segments: 10 },
+          offset: [-0.16, 0, 0],
+          rotation: [Math.PI / 2, 0, 0],
+          repeat: { count: 8, step: [0.045, 0, 0] },
+          color: '#14171b',
+        },
+      ],
+      tagline: 'The small driver you hold against your ear',
+      body: [
+        'A miniature moving-coil speaker: a coil of hair-thin wire sits in the field of a tiny permanent magnet, glued to a diaphragm. Audio current through the coil makes it push and pull against the magnet, and the diaphragm shoves air.',
+        'It is tuned very differently from the loudspeaker at the bottom of the phone. Held against your ear it only needs to move a whisper of air, so it can be optimised for clear mid-range speech rather than volume.',
+        'On most modern phones it does double duty as the second channel for stereo playback, which is why audio sounds lopsided — the top driver is physically much smaller than the bottom one.',
+      ],
+      analogy:
+        'The same mechanism as a concert speaker, scaled down until the cone is smaller than a shirt button.',
+    },
+    {
+      id: 'midframe',
+      name: 'Midframe Chassis',
+      category: 'structure',
+      layer: 4,
+      position: [0, 0, 0],
+      explode: [0, 0, 0.45],
+      color: ALUMINIUM,
+      metalness: 0.88,
+      roughness: 0.36,
+      shape: [
+        // Rails sit at the very edge of the 1.45 x 3.0 body, leaving a
+        // 1.35 x 2.90 aperture — a thin bezel, as on a modern phone.
+        { geometry: { type: 'box', size: [0.05, 3.0, 0.16], radius: 0.02 }, offset: [-0.7, 0, 0] },
+        { geometry: { type: 'box', size: [0.05, 3.0, 0.16], radius: 0.02 }, offset: [0.7, 0, 0] },
+        { geometry: { type: 'box', size: [1.35, 0.05, 0.16], radius: 0.02 }, offset: [0, 1.475, 0] },
+        { geometry: { type: 'box', size: [1.35, 0.05, 0.16], radius: 0.02 }, offset: [0, -1.475, 0] },
+        { geometry: { type: 'box', size: [1.3, 1.1, 0.02] }, offset: [0, 0.35, 0], roughness: 0.45 },
+      ],
+      tagline: 'The skeleton everything else bolts to',
+      body: [
+        'The midframe is the structural spine of the phone, usually machined or forged from an aluminium alloy, with stainless steel or titanium used on premium models for extra stiffness.',
+        'Everything hangs off it: the display is bonded to its front face, the board and battery sit in pockets on its back, and the whole thing resists the bending loads of a phone being sat on. The central web you can see here is not decorative — it is what stops the phone flexing enough to crack the display.',
+        'It is also electrically important. The frame is a big piece of grounded metal in a device trying to radiate radio waves, so it is deliberately split by non-conductive bands that turn sections of the frame itself into antennas rather than letting it act as a shield.',
+      ],
+      specs: [
+        { label: 'Material', value: '6000/7000-series aluminium, or steel/titanium' },
+        { label: 'Process', value: 'CNC machined from forged blank' },
+        { label: 'Second role', value: 'Carries antenna segments' },
+      ],
+      analogy:
+        'The unibody of a car: not the part you look at, but the part that decides whether everything else stays aligned.',
+    },
+    {
+      id: 'logic-board',
+      name: 'Logic Board',
+      category: 'compute',
+      layer: 5,
+      position: [0, 0.88, -0.025],
+      explode: [0, 0.45, -0.6],
+      color: PCB_GREEN,
+      metalness: 0.15,
+      roughness: 0.65,
+      shape: [
+        { geometry: { type: 'box', size: [1.22, 0.92, 0.045], radius: 0.02 } },
+        {
+          geometry: { type: 'box', size: [0.3, 0.3, 0.05] },
+          offset: [-0.24, 0.12, 0.045],
+          color: '#101216',
+          metalness: 0.3,
+          roughness: 0.5,
+        },
+        {
+          geometry: { type: 'box', size: [0.22, 0.22, 0.03] },
+          offset: [0.21, 0.18, 0.04],
+          color: '#1a1d22',
+          metalness: 0.3,
+          roughness: 0.5,
+        },
+        {
+          geometry: { type: 'box', size: [0.18, 0.14, 0.025] },
+          offset: [0.3, -0.18, 0.038],
+          color: '#1a1d22',
+        },
+        {
+          geometry: { type: 'box', size: [0.05, 0.05, 0.02] },
+          offset: [-0.45, -0.28, 0.035],
+          repeat: { count: 6, step: [0.14, 0, 0] },
+          color: '#2a2d33',
+        },
+        {
+          geometry: { type: 'box', size: [0.03, 0.09, 0.012] },
+          offset: [-0.4, 0.38, 0.03],
+          repeat: { count: 9, step: [0.09, 0, 0] },
+          color: '#c9a227',
+          metalness: 0.9,
+          roughness: 0.25,
+        },
+      ],
+      tagline: 'The entire computer, on a board smaller than a credit card',
+      body: [
+        'Everything you would recognise as a computer lives here. At its centre is the system-on-chip: processor cores, graphics, memory controller, image processor, neural accelerator and often the modem, all etched into a single piece of silicon a centimetre square containing north of fifteen billion transistors.',
+        'Space is so tight that the RAM is not given its own spot on the board — it is stacked directly on top of the processor in a package-on-package arrangement, with hundreds of solder balls connecting the two vertically. The flash storage, the power management chip and the radio front-end take up most of what is left.',
+        'The board itself is not a simple circuit board. It is ten or more layers of copper laminated together with laser-drilled vias linking them, and on many phones it is two such boards stacked face to face with a connector between them, folding the whole computer into half the footprint.',
+      ],
+      specs: [
+        { label: 'SoC transistors', value: '15 – 20 billion' },
+        { label: 'Process node', value: '3 – 4 nm class' },
+        { label: 'Board layers', value: '10 – 12 copper layers' },
+        { label: 'Memory', value: 'LPDDR5X stacked on the SoC' },
+      ],
+      analogy:
+        'A city built on twelve underground levels, where the roads are thinner than a wavelength of light.',
+    },
+    {
+      id: 'battery',
+      name: 'Lithium-Ion Battery',
+      category: 'power',
+      layer: 5,
+      position: [0, -0.62, -0.02],
+      explode: [0, -0.5, -0.55],
+      color: '#4a5058',
+      metalness: 0.55,
+      roughness: 0.5,
+      shape: [
+        { geometry: { type: 'box', size: [1.24, 1.5, 0.08], radius: 0.02 } },
+        {
+          geometry: { type: 'box', size: [0.4, 0.06, 0.02] },
+          offset: [0.3, 0.78, 0],
+          color: '#d8b84a',
+          metalness: 0.8,
+          roughness: 0.3,
+        },
+      ],
+      tagline: 'Lithium shuttling back and forth between two sponges',
+      body: [
+        'A lithium-ion cell is two layers that both love lithium, separated by a membrane that lets lithium ions through but not electrons. Charging pushes lithium ions out of a cobalt- or iron-based oxide and into a graphite layer that holds them between its sheets; discharging lets them travel back.',
+        'Because the ions can cross the separator but electrons cannot, the electrons are forced to take the long way round — out through the phone, doing useful work on the way. That detour is the entire point. Nothing is burned and no material is consumed; charge and discharge just move the same lithium back and forth, which is why it can be repeated hundreds of times.',
+        'It degrades because that shuttle is imperfect. A little lithium is permanently locked into a film that grows on the graphite each cycle, the layers swell and contract and slowly crack, and both effects accelerate with heat and with sitting at a full charge. After a few hundred full cycles a typical cell holds around 80% of what it started with.',
+        'It is a pouch cell rather than a cylinder: the layers are wound or stacked flat and sealed in aluminium-laminated foil, which wastes less space but has no metal can to contain a failure. That is why it gets its own protection circuit and why a swollen battery is treated as urgent.',
+      ],
+      specs: [
+        { label: 'Chemistry', value: 'Lithium cobalt/nickel oxide + graphite' },
+        { label: 'Nominal voltage', value: '3.8 – 3.85 V' },
+        { label: 'Typical capacity', value: '4000 – 5000 mAh (~17 Wh)' },
+        { label: 'Cycle life', value: '~500 cycles to 80% capacity' },
+      ],
+      analogy:
+        'Two sponges and one bucket of water. Charging wrings the water into one sponge; using the phone lets it soak back, and you tap the flow on the way past.',
+    },
+    {
+      id: 'taptic-engine',
+      name: 'Haptic Actuator',
+      category: 'haptics',
+      layer: 6,
+      position: [-0.32, -1.3, -0.02],
+      explode: [-0.65, -0.5, -0.95],
+      color: '#5a6069',
+      metalness: 0.75,
+      roughness: 0.35,
+      shape: [
+        { geometry: { type: 'box', size: [0.52, 0.22, 0.09], radius: 0.02 } },
+        {
+          geometry: { type: 'box', size: [0.2, 0.14, 0.07] },
+          offset: [0.05, 0, 0.012],
+          color: COPPER,
+          metalness: 0.85,
+          roughness: 0.3,
+        },
+      ],
+      tagline: 'A weight on a spring, slammed back and forth by a coil',
+      body: [
+        'The sharp tap you feel when you type is not a spinning motor. It is a linear resonant actuator: a small magnetic mass suspended on springs inside a coil. Driving the coil with an alternating current throws the mass along one axis, and the whole phone shoves back against it.',
+        'The reason it feels like a click rather than a buzz is control. The mass has a natural resonant frequency, usually around 150 Hz, and the driver can both start it in a single cycle and actively brake it by driving the coil in reverse. Start fast, stop fast, and your skin reads it as a discrete event rather than a vibration.',
+        'The older alternative — an off-centre weight on a spinning motor — cannot do this. It has to spin up and coast down, which takes tens of milliseconds at each end and always feels like a rattle.',
+      ],
+      specs: [
+        { label: 'Type', value: 'Linear resonant actuator (LRA)' },
+        { label: 'Resonant frequency', value: '~150 Hz' },
+        { label: 'Response time', value: 'Under 10 ms to full amplitude' },
+      ],
+      analogy:
+        'Punching the inside of a cardboard box. The box jumps because something inside it threw itself at the wall.',
+    },
+    {
+      id: 'loudspeaker',
+      name: 'Loudspeaker Module',
+      category: 'audio',
+      layer: 6,
+      position: [0.36, -1.3, -0.02],
+      explode: [0.65, -0.5, -0.95],
+      color: '#33373e',
+      metalness: 0.4,
+      roughness: 0.55,
+      shape: [
+        { geometry: { type: 'box', size: [0.52, 0.26, 0.1], radius: 0.025 } },
+        {
+          geometry: { type: 'cylinder', radius: 0.08, height: 0.06, segments: 24 },
+          offset: [0, 0, 0.03],
+          rotation: [Math.PI / 2, 0, 0],
+          color: '#15181c',
+        },
+      ],
+      tagline: 'A tiny driver cheating physics with a sealed air chamber',
+      body: [
+        'Low frequencies need to move a lot of air, and a driver this small cannot. The trick is the box around it: the module seals a precisely shaped air cavity behind the driver, and that trapped air acts as a spring that lowers the driver\'s resonant frequency, letting it reach further down than its size suggests.',
+        'Some phones go further and fill the chamber with a zeolite-like powder. The gas molecules adsorb onto the powder\'s enormous internal surface area as pressure rises, which makes the cavity behave as though it were physically larger than it is.',
+        'The sound does not leave through the back of the phone. It is routed through a moulded channel to a slot on the bottom edge, which is why covering that one slot with a finger kills most of the volume.',
+      ],
+      analogy:
+        'A guitar body. The string makes the sound, but the box behind it decides how big that sound gets to be.',
+    },
+    {
+      id: 'charging-port',
+      name: 'USB-C Port & Flex',
+      category: 'connectivity',
+      layer: 6,
+      position: [0, -1.42, -0.01],
+      explode: [0, -0.85, -0.75],
+      color: STEEL,
+      metalness: 0.85,
+      roughness: 0.3,
+      shape: [
+        { geometry: { type: 'box', size: [0.3, 0.09, 0.11], radius: 0.03 } },
+        {
+          geometry: { type: 'box', size: [0.26, 0.5, 0.012] },
+          offset: [0, 0.3, 0],
+          color: '#b07a2a',
+          metalness: 0.3,
+          roughness: 0.6,
+        },
+      ],
+      tagline: 'Reversible because it has two of everything',
+      body: [
+        'A USB-C connector is reversible for a blunt reason: the pins are mirrored top and bottom, so whichever way you insert it, a valid set of contacts lines up. A small controller chip then works out which orientation happened and routes the signals accordingly.',
+        'Two of the pins do nothing but negotiate. Before any serious power flows, the device and the charger talk over those channel-configuration pins and agree on a voltage and current — which is why the same socket can take half a watt from a laptop or sixty from a fast charger without either end guessing.',
+        'It is mounted on a flexible printed circuit rather than soldered to the main board. The port is the most mechanically abused component in the phone, so making it a separate, cheap, replaceable assembly is a deliberate design choice.',
+      ],
+      specs: [
+        { label: 'Contacts', value: '24 pins, mirrored for reversibility' },
+        { label: 'Power negotiation', value: 'USB Power Delivery over CC pins' },
+        { label: 'Mounting', value: 'Separate flex assembly, replaceable' },
+      ],
+    },
+    {
+      id: 'antennas',
+      name: 'Antenna Array',
+      category: 'connectivity',
+      layer: 7,
+      position: [0, 0, -0.04],
+      explode: [0, 0.75, -0.85],
+      color: '#c9a227',
+      metalness: 0.9,
+      roughness: 0.25,
+      shape: [
+        { geometry: { type: 'box', size: [1.2, 0.07, 0.01] }, offset: [0, 1.3, 0] },
+        { geometry: { type: 'box', size: [1.2, 0.07, 0.01] }, offset: [0, -1.3, 0] },
+        { geometry: { type: 'box', size: [0.05, 0.5, 0.01] }, offset: [-0.6, 0.6, 0] },
+        { geometry: { type: 'box', size: [0.05, 0.5, 0.01] }, offset: [0.6, 0.6, 0] },
+        {
+          geometry: { type: 'box', size: [0.04, 0.04, 0.008] },
+          offset: [-0.18, 1.3, 0.01],
+          repeat: { count: 4, step: [0.12, 0, 0] },
+          color: '#e8d48a',
+        },
+      ],
+      tagline: 'Metal cut to the exact length of the wave it listens for',
+      body: [
+        'A phone carries a dozen or more antennas — cellular low band, mid band, high band, Wi-Fi, Bluetooth, GPS, NFC, ultra-wideband — and they all have to work from inside a slab of metal and glass held in a wet hand.',
+        'The governing rule is that an antenna wants to be a simple fraction of the wavelength it handles. At 700 MHz a wavelength is about 43 cm, so a quarter-wave element would be 10 cm — longer than the phone. Designers get around this by folding the element, loading it with capacitance, and using the metal midframe itself as part of the radiating structure, with the plastic splits in the frame acting as the boundaries between elements.',
+        'The small square patches here are a millimetre-wave module. At 28 GHz a wavelength is about a centimetre, so antennas finally become tiny — small enough to put several in a row and steer the beam electronically by shifting the timing between them.',
+        'This is also why your grip matters. A hand across the lower band element detunes it and absorbs its energy, and the phone responds by switching to a different element and turning up transmit power.',
+      ],
+      specs: [
+        { label: 'Antenna count', value: '12 – 20 elements' },
+        { label: 'Bands', value: '600 MHz – 40 GHz' },
+        { label: 'mmWave', value: 'Phased array, electronically steered' },
+      ],
+      analogy:
+        'A tuning fork for radio. It only rings loudly at the one pitch its length was cut for.',
+    },
+    {
+      id: 'wireless-coil',
+      name: 'Wireless Charging Coil',
+      category: 'power',
+      layer: 7,
+      position: [0, 0.1, -0.05],
+      explode: [0, 0, -1.5],
+      color: COPPER,
+      metalness: 0.88,
+      roughness: 0.3,
+      shape: [
+        { geometry: { type: 'torus', radius: 0.46, tube: 0.016, segments: 48 }, rotation: [0, 0, 0] },
+        { geometry: { type: 'torus', radius: 0.4, tube: 0.016, segments: 48 } },
+        { geometry: { type: 'torus', radius: 0.34, tube: 0.016, segments: 48 } },
+        { geometry: { type: 'torus', radius: 0.28, tube: 0.016, segments: 48 } },
+        {
+          geometry: { type: 'cylinder', radius: 0.52, height: 0.008, segments: 40 },
+          offset: [0, 0, -0.02],
+          rotation: [Math.PI / 2, 0, 0],
+          color: '#3b3f46',
+          metalness: 0.4,
+          roughness: 0.7,
+        },
+      ],
+      tagline: 'A transformer cut in half, with air in the gap',
+      body: [
+        'Wireless charging is an ordinary transformer that someone sawed in two. The charging pad holds one coil and drives it with alternating current at around 125 kHz; that current creates a changing magnetic field, and any coil placed in that field has a voltage induced in it. The phone\'s coil is the second half.',
+        'The grey disc behind the coil is ferrite, and it is not optional. It gives the magnetic field a low-resistance path to follow, concentrating it through the coil instead of letting it spill into the battery and the logic board — where it would induce currents in the metal and simply turn into heat.',
+        'The efficiency cost is real: roughly a quarter of the energy is lost across the gap compared with a cable, almost all of it as heat in the phone. That heat is also why a phone charges more slowly on a pad as it warms up.',
+      ],
+      specs: [
+        { label: 'Standard', value: 'Qi / Qi2 inductive' },
+        { label: 'Operating frequency', value: '110 – 205 kHz' },
+        { label: 'Typical efficiency', value: '~75%, versus ~95% wired' },
+      ],
+      analogy:
+        'Two tuning forks. Strike one and the other hums, without anything passing between them but the field.',
+    },
+    {
+      id: 'rear-camera',
+      name: 'Rear Camera Array',
+      category: 'imaging',
+      layer: 8,
+      position: [-0.38, 1.08, -0.055],
+      explode: [-0.7, 0.55, -1.35],
+      color: '#1c1f24',
+      metalness: 0.6,
+      roughness: 0.35,
+      shape: [
+        { geometry: { type: 'box', size: [0.68, 0.68, 0.06], radius: 0.1 } },
+        {
+          geometry: { type: 'cylinder', radius: 0.14, height: 0.1, segments: 32 },
+          offset: [-0.14, 0.14, -0.06],
+          rotation: [Math.PI / 2, 0, 0],
+          color: '#0b0f18',
+          metalness: 0.95,
+          roughness: 0.04,
+        },
+        {
+          geometry: { type: 'cylinder', radius: 0.14, height: 0.1, segments: 32 },
+          offset: [0.14, 0.14, -0.06],
+          rotation: [Math.PI / 2, 0, 0],
+          color: '#0b0f18',
+          metalness: 0.95,
+          roughness: 0.04,
+        },
+        {
+          geometry: { type: 'cylinder', radius: 0.14, height: 0.1, segments: 32 },
+          offset: [-0.14, -0.14, -0.06],
+          rotation: [Math.PI / 2, 0, 0],
+          color: '#0b0f18',
+          metalness: 0.95,
+          roughness: 0.04,
+        },
+        {
+          geometry: { type: 'cylinder', radius: 0.06, height: 0.08, segments: 20 },
+          offset: [0.16, -0.16, -0.05],
+          rotation: [Math.PI / 2, 0, 0],
+          color: '#e8e2c0',
+          emissive: '#ffeaa0',
+          emissiveIntensity: 0.4,
+        },
+      ],
+      tagline: 'Three focal lengths, because the lens cannot move far enough to zoom',
+      body: [
+        'A phone cannot zoom the way a camera does, because optical zoom needs lens groups to travel along the axis and there is only a few millimetres of depth to travel in. The industry\'s answer was to stop trying and bolt on several fixed-focal-length cameras instead — typically an ultra-wide, a main, and a telephoto — then switch between them and crop in between.',
+        'The telephoto often plays a further trick: a prism turns the light path ninety degrees so the lens can run sideways along the width of the phone instead of out the back. That periscope layout is what makes 5x optical zoom fit in a body 8 mm thick.',
+        'Stabilisation is mechanical. The sensor or the lens is suspended on springs and pushed by coils, and the system reads the phone\'s gyroscope hundreds of times a second to shove the optics in the opposite direction to your hand tremor. Beyond that, most of what you would call image quality is computation — the camera captures a burst of frames at different exposures and merges them, which is why a phone photo looks nothing like the single frame its sensor actually sees.',
+      ],
+      specs: [
+        { label: 'Cameras', value: 'Ultra-wide, main, telephoto' },
+        { label: 'Main sensor', value: '1/1.3" – 1" class' },
+        { label: 'Stabilisation', value: 'Optical, gyroscope-driven' },
+        { label: 'Telephoto', value: 'Periscope with folding prism' },
+      ],
+      analogy:
+        'Rather than one zoom lens, a photographer carrying three primes and swapping between them instantly.',
+    },
+    {
+      id: 'fasteners',
+      name: 'Fasteners',
+      category: 'mechanical',
+      layer: 9,
+      position: [0, 0, -0.06],
+      explode: [0, 0, -1.15],
+      color: '#9aa0aa',
+      metalness: 0.95,
+      roughness: 0.25,
+      shape: [
+        {
+          geometry: { type: 'cylinder', radius: 0.035, height: 0.06, segments: 12 },
+          offset: [-0.55, 1.35, 0],
+          rotation: [Math.PI / 2, 0, 0],
+          repeat: { count: 3, step: [0.55, 0, 0] },
+        },
+        {
+          geometry: { type: 'cylinder', radius: 0.035, height: 0.06, segments: 12 },
+          offset: [-0.55, -1.35, 0],
+          rotation: [Math.PI / 2, 0, 0],
+          repeat: { count: 3, step: [0.55, 0, 0] },
+        },
+        {
+          geometry: { type: 'cylinder', radius: 0.035, height: 0.06, segments: 12 },
+          offset: [-0.55, 0.2, 0],
+          rotation: [Math.PI / 2, 0, 0],
+          repeat: { count: 3, step: [0.55, 0, 0] },
+        },
+      ],
+      tagline: 'Dozens of screws, several of them deliberately unusual',
+      body: [
+        'A phone contains somewhere between twenty and sixty screws, most under 1.5 mm across and many of different lengths that must go back into the hole they came from — putting a long screw into a short hole will push it through a board trace.',
+        'Many are not standard drive types. Pentalobe, tri-point and similar heads exist mainly to make casual disassembly inconvenient, and they are a recurring argument in right-to-repair legislation.',
+        'Screws are not the only fastener in here. The battery is held by stretch-release adhesive strips, the display is bonded with a waterproofing gasket of pressure-sensitive adhesive, and several flex cables are held by press-fit connectors that pop off like Lego and are easy to tear.',
+      ],
+      analogy:
+        'Less like a bookshelf you assemble and more like a watch: small, ordered, and unforgiving about which screw goes where.',
+    },
+    {
+      id: 'rear-glass',
+      name: 'Back Cover',
+      category: 'structure',
+      layer: 10,
+      position: [0, 0, -0.075],
+      explode: [0, 0, -2.05],
+      color: '#2a2e35',
+      metalness: 0.4,
+      roughness: 0.25,
+      opacity: 0.92,
+      shape: [{ geometry: { type: 'box', size: [1.45, 3.0, 0.012], radius: 0.08 } }],
+      tagline: 'Glass, because radio does not pass through metal',
+      body: [
+        'The back is glass or plastic for one unavoidable reason: wireless charging and most of the radios need to transmit through it, and a continuous metal sheet would short the magnetic field and block the antennas. Phones had aluminium backs until wireless charging arrived, and then the whole industry switched.',
+        'It is also doing waterproofing work. It is bonded to the midframe with a continuous adhesive gasket, which is what earns the phone its ingress-protection rating — and what makes opening the phone require heat and a lot of patience, since that seal has to be cut and then replaced.',
+        'The finish is usually etched rather than polished. Acid etching the inner surface gives the frosted look while leaving the outer face smooth and easy to clean.',
+      ],
+      specs: [
+        { label: 'Material', value: 'Strengthened glass or composite' },
+        { label: 'Attachment', value: 'Continuous adhesive gasket' },
+        { label: 'Reason for glass', value: 'RF and inductive transparency' },
+      ],
+    },
+  ],
+}
